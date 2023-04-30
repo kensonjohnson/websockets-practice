@@ -1,10 +1,17 @@
-import { WebSocketServer } from "ws";
-const ws = new WebSocketServer({ port: 3000 });
+import { WebSocket } from "ws";
+const ws = new WebSocket("ws://Orpheus:3000");
 
-ws.on("connection", (ws) => {
+ws.onopen = () => {
+  let message = "Hello from Client!!";
+  ws.send(JSON.stringify(message));
+};
+
+ws.onmessage = function (e) {
   console.log("Connection Established.");
-  let msg = "This message came from the server.";
-  ws.send(JSON.stringify(msg));
-  console.log("Message sent. Shutting down...");
-  process.exit();
-});
+  let message = JSON.parse(e.data);
+  console.log(message);
+};
+
+ws.onclose = () => {
+  console.log("Connection closed.");
+};
