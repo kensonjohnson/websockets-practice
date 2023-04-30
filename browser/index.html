@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Websocket Testing</title>
+</head>
+
+<body>
+  <header>
+    <h1>Websockets</h1>
+  </header>
+  <main>
+    <section>
+      <form data-url-form action="">
+        <label for="hostURL">Enter host URL</label>
+        <input type="text" name="hostURL" data-url-input />
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+    <section>
+      <h2>Output:</h2>
+      <p data-text-output>Please enter a host to connect to.</p>
+      <button data-disconnect-button disabled>Disconnect</button>
+    </section>
+  </main>
+</body>
+
+</html>
+
+<script>
+  const form = document.querySelector("[data-url-form]");
+  const urlInput = document.querySelector("[data-url-input]");
+  const displayText = document.querySelector("[data-text-output]");
+  const disconnectButton = document.querySelector("[data-disconnect-button]");
+  let webSocket = null;
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    if (webSocket === null) {
+      try {
+        webSocket = new WebSocket(urlInput.value)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (webSocket !== null) {
+      // Handle new connection
+      webSocket.onopen = (e) => {
+        console.log("Connection opened")
+        webSocket.send(JSON.stringify("This comes from the browser"));
+        disconnectButton.disabled = false
+      }
+
+
+      // Handle messages received
+      webSocket.onmessage = (e) => {
+        console.log("Connection Established.");
+        displayText.innerText = JSON.parse(e.data)
+      };
+
+      // Handle connection closed
+      webSocket.onclose = (e) => {
+        console.log(e)
+        console.log("Connection closed.");
+      };
+    }
+
+
+  }
+  form.onsubmit = handleFormSubmit;
+
+  disconnectButton.onclick = () => {
+    if (webSocket !== null) {
+      webSocket.close()
+    }
+  }
+</script>
